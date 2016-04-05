@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>All in Camera</title>
-    <link>http://allincamera.github.io/</link>
-    <description>Recent content on All in Camera</description>
+    <title>Sensor on All in Camera</title>
+    <link>http://allincamera.github.io/tags/sensor/</link>
+    <description>Recent content in Sensor on All in Camera</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 05 Apr 2016 11:31:59 +0800</lastBuildDate>
-    <atom:link href="http://allincamera.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://allincamera.github.io/tags/sensor/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>HDR Sensor 原理介绍</title>
@@ -117,22 +117,6 @@ i_min是sensor的底电流（blacklevel） ；&lt;/p&gt;
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/2_5_hdr.png&#34; alt=&#34;After HDR&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;上图就是用方法2 + 方法5处理后的HDR图像。亮处与暗处的细节都得到了很好的展现。&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>关于本站</title>
-      <link>http://allincamera.github.io/about/</link>
-      <pubDate>Tue, 05 Apr 2016 11:02:57 +0800</pubDate>
-      
-      <guid>http://allincamera.github.io/about/</guid>
-      <description>&lt;p&gt;分享有关成像的软硬件及算法知识，交流相关开发经验，欢迎投稿&lt;/p&gt;
-
-&lt;p&gt;Powered by &lt;a href=&#34;https://gohugo.io/&#34;&gt;https://gohugo.io/&lt;/a&gt; &amp;amp; &lt;a href=&#34;https://disqus.com&#34;&gt;https://disqus.com&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Here we discuss camera, welcome to add comments in page or send post &lt;a href=&#34;https://github.com/allincamera/allincamera.github.io.git&#34;&gt;https://github.com/allincamera/allincamera.github.io.git&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/ptthisdan/imgur/master/about.png&#34; alt=&#34;About This Site&#34; /&gt;&lt;/p&gt;
 </description>
     </item>
     
