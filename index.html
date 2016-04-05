@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.15" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> All in Camera &middot; All in Camera </title>
+
+  
+  <link rel="stylesheet" href="http://allincamera.github.io/css/poole.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/syntax.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="http://allincamera.github.io/index.xml" rel="alternate" type="application/rss+xml" title="All in Camera" />
+</head>
+
+<body class=" ">
+
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://allincamera.github.io/"><h1>All in Camera</h1></a>
+      <p class="lead">
+      An elegant open source and mobile first theme for <a href="http://hugo.spf13.com">hugo</a> made by <a href="http://twitter.com/mdo">@mdo</a>. Originally made for Jekyll.
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+    </ul>
+
+    <p>&copy; 2016. All rights reserved. </p>
+  </div>
+</div>
+
+
+    <div class="content container">
+<div class="posts">
+
+      
+  <div class="post">
+    <h1 class="post-title">
+      <a href="http://allincamera.github.io/post/hdr_sensor_intro/">
+        HDR Sensor 原理介绍
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Apr 5, 2016</span>
+
+    
+
+<p>在介绍HDR Sensor原理之前首先讨论为什么需要HDR Sensor.</p>
+
+<h2 id="什么是sensor的动态范围-dynamic-range:8adb1af61272cd03fe2458d7ffdec523">什么是sensor的动态范围（dynamic range）？</h2>
+
+<p>sensor的动态范围就是sensor在一幅图像里能够同时体现高光和阴影部分内容的能力。
+用公式表达这种能力就是：</p>
+
+<blockquote>
+<p>DR = 20log10（i_max / i_min); //dB</p>
+</blockquote>
+
+<p>i_max 是sensor的最大不饱和电流&mdash;-也可以说是sensor刚刚饱和时候的电流
+i_min是sensor的底电流（blacklevel） ；</p>
+
+<h2 id="为什么hdr在成像领域是个大问题:8adb1af61272cd03fe2458d7ffdec523">为什么HDR在成像领域是个大问题？</h2>
+
+<p>在自然界的真实情况，有些场景的动态范围要大于100dB。</p>
+
+<p><strong>人眼的动态范围可以达到100dB。</strong></p>
+
+<p>Sensor 的动态范围： <strong>高端的 &gt;78 dB; 消费级的 60 dB 上下；</strong></p>
+
+<p>所以当sensor的动态范围小于图像场景动态范围的时候就会出现HDR问题&mdash;-不是暗处看不清，就是亮处看不清，有的甚至两头都看不清。
+<img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/dark_blur.png" alt="Dark Blur Photo" />
+暗处看不清&ndash;前景处的广告牌和树影太暗看不清。
+<img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/bright_blur.png" alt="Bright Blur Photo" />
+亮处看不清&ndash;远处背景的白云变成了一团白色，完全看不清细节。</p>
+
+<h2 id="解决hdr问题的数学分析:8adb1af61272cd03fe2458d7ffdec523">解决HDR问题的数学分析</h2>
+
+<p>根据前边动态范围公式</p>
+
+<blockquote>
+<p>DR = 20log10（i_max / i_min); //dB</p>
+</blockquote>
+
+<p>从数学本质上说要提高DR，就是提高i_max，减小 i_min；</p>
+
+<ul>
+<li><p>对于10bit输出的sensor, i_max =1023，i_min =1, 动态范围DR = 60；</p></li>
+
+<li><p>对于12bit输出的sensor， DR = 72；</p></li>
+</ul>
+
+<p>所以从数学上来看，提高sensor 输出的bit width就可以提高动态范围，从而解决HDR问题。可是现实上却没有这么简单。提高sensor的bit width导致不仅sensor的成本提高，整个图像处理器的带宽都得相应提高，消耗的内存也都相应提高，这样导致整个系统的成本会大幅提高。所以大家想出许多办法，既能解决HDR问题，又可以不增加太多成本。</p>
+
+<h2 id="解决hdr问题的5种方法:8adb1af61272cd03fe2458d7ffdec523">解决HDR问题的5种方法</h2>
+
+<p>从sensor的角度完整的DR 公式：</p>
+
+<p><img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/dr_formula.png" alt="DR Formula" /></p>
+
+<ul>
+<li>Qsat ：Well Capacity   idc:  底电流，tint：曝光时间，σ:噪声。</li>
+</ul>
+
+<h3 id="方法1-提高qsat-well-capacity:8adb1af61272cd03fe2458d7ffdec523">方法1：提高Qsat  &ndash;Well capacity 。</h3>
+
+<p>就是提高感光井的能力，这就涉及到sensor的构造，简单说，sensor的每个像素就像一口井，光子射到井里产生光电转换效应，井的容量如果比较大，容纳的电荷就比较多，这样i_max的值就更大。普通的sensor well只reset一次，但是为了提高动态范围，就产生了多次reset的方法。
+通过多次reset，imax增加到i‘max，上图就是current to charge的转换曲线。
+但这种方法的缺点是增加FPN，而且sensor的响应变成非线性，后边的处理会增加难度。</p>
+
+<h3 id="方法2-多曝光合成:8adb1af61272cd03fe2458d7ffdec523">方法2：多曝光合成</h3>
+
+<p>本质上这种方法就是用短曝光获取高光处的图像，用长曝光获取阴暗处的图像。有的厂家用前后两帧长短曝光图像，或者前后三针长、中、短曝光图像进行融合</p>
+
+<p>&rdquo;&rsquo;
+    If (Intensity &gt; a) intensity = short_exposure_frame;
+    If (Intensity &lt; b) intensity = long_exposure_frame;
+    If (b&lt;Intensity &lt;a) intensity = long_exposure_frame x p + short_exposure_frame x q;
+&ldquo;&rsquo;</p>
+
+<p>当该像素值大于一个门限时，这个像素的数值就是来自于短曝光，小于一个数值，该像素值就来自于长曝光，在中间的话，就用长短曝光融合。这是个比较简化的方法，实际上还要考虑噪声等的影响。</p>
+
+<p><img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/curve_multi_frame_current.png" alt="Curve Multi Frame Current" /></p>
+
+<p>Current to charge曲线显示：imax增加a倍。
+这种多帧融合的方法需要非常快的readout time，而且即使readout时间再快，多帧图像也会有时间差，所以很难避免在图像融合时产生的鬼影问题。尤其在video HDR的时候，由于运算时间有限，无法进行复杂的去鬼影的运算，会有比较明显的问题。于是就出现了单帧的多曝光技术。</p>
+
+<h3 id="方法3-单帧空间域多曝光:8adb1af61272cd03fe2458d7ffdec523">方法3：单帧空间域多曝光。</h3>
+
+<p>最开始的方法是在sensor的一些像素上加ND filter，让这些像素获得的光强度变弱，所以当其他正常像素饱和的时候，这些像素仍然没有饱和，不过这样做生产成本比较高，同时给后边的处理增加很多麻烦。所以下面的这种隔行多曝光方法更好些。</p>
+
+<p><img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/single_frame_multi_exp.png" alt="Single Frame Multi Exposure" /></p>
+
+<p>如上图所示,两行短曝光，再两行长曝光,然后做图像融合，这样可以较好的避免多帧融合的问题，从而有效的在video中实现HDR。同时由于video的分辨率比still要低很多，所以这个方法所产生的分辨率降低也不是问题。这个方法是现在video hdr sensor的主流技术。</p>
+
+<h3 id="方法4-logarithmic-sensor:8adb1af61272cd03fe2458d7ffdec523">方法4：logarithmic sensor</h3>
+
+<p>实际是一种数学方法，把图像从线性域压缩到log域，从而压缩了动态范围，在数字通信里也用类似的技术使用不同的函数进行压缩，在isp端用反函数再恢复到线性，再做信号处理。</p>
+
+<p>缺点一方面是信号不是线性的，另一方面会增加FPN，同时由于压缩精度要求对硬件设计要求高。</p>
+
+<h3 id="方法5-局部适应-local-adaption:8adb1af61272cd03fe2458d7ffdec523">方法5：局部适应 local adaption</h3>
+
+<p>这是种仿人眼的设计，人眼会针对局部的图像特点进行自适应，既能够增加局部的对比度，同时保留大动态范围。这种算法比较复杂，有很多论文单独讨论。目前在sensor 端还没有使用这种技术，在ISP和后处理这种方法已经得到了非常好的应用。</p>
+
+<p><img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/hdr_sensor_intro/2_5_hdr.png" alt="After HDR" /></p>
+
+<p>上图就是用方法2 + 方法5处理后的HDR图像。亮处与暗处的细节都得到了很好的展现。</p>
+
+  </div>
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="http://allincamera.github.io/about/">
+        关于本站
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Apr 5, 2016</span>
+
+    <p>分享有关成像的软硬件及算法知识，交流相关开发经验
+<img src="https://raw.githubusercontent.com/ptthisdan/imgur/master/about.png" alt="About This Site" /></p>
+
+  </div>
+  
+</div>
+</div>
+
+  </body>
+</html>
