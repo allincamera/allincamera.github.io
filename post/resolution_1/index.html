@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>解析力 （1 ）MTF SFR &middot; All in Camera</title>
+
+  
+  <link rel="stylesheet" href="http://allincamera.github.io/css/poole.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/poole-overrides.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde-overrides.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde-x.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/highlight/sunburst.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://allincamera.github.io/touch-icon-144-precomposed.png">
+  <link href="http://allincamera.github.io/favicon.png" rel="icon">
+
+  
+  
+  
+  
+
+  <meta name="description" content="Everything about Camera">
+  <meta name="keywords" content="Camera, Imaging, Tech, technique, ISP, algorithm">
+  
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'Your Google Analytics tracking code', 'auto');
+    ga('send', 'pageview');
+  </script>
+  
+</head>
+<body class="theme-base-0b">
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      
+        <img src="https://www.gravatar.com/avatar/7100bb8dad0bb0641c343caf30e9613d?s=200"
+             alt="gravatar" title="All in Camera">
+      
+      <h1>All in Camera</h1>
+      <p class="lead">Here we discuss all about camera.</p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item"><a href="http://allincamera.github.io/">Blog</a></li>
+      
+    </ul>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item">
+      <a href="https://github.com/allincamera"><i class="fa fa-github-square fa-3x"></i></a>
+      
+      
+      <a href="https://www.linkedin.com/in/xiadan"><i class="fa fa-linkedin-square fa-3x"></i></a>
+      <a href="https://plus.google.com/u/0/112601184917141694227"><i class="fa fa-google-plus-square fa-3x"></i></a>
+      
+      <a href="https://twitter.com/ptthisdan"><i class="fa fa-twitter-square fa-3x"></i></a>
+      
+      <a href="http://allincamera.github.io/index.xml" type="application/rss+xml"><i class="fa fa-rss-square fa-3x"></i></a>
+      </li>
+    </ul>
+
+    
+
+    <p>Copyright &copy; 2016 <a href="http://allincamera.github.io/license/">License</a><br/>
+       Powered by <a href="http://gohugo.io">Hugo</a> and <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
+  </div>
+</div>
+
+
+<div class="content container">
+  <div class="post">
+    <h1 class="post-title">解析力 （1 ）MTF SFR</h1>
+    <span class="post-date">Apr 6, 2016 &middot; 1 minute read &middot; <a href="http://allincamera.github.io/post/resolution_1/#disqus_thread">Comments</a>
+    
+    <br/>
+    <a class="label" href="http://allincamera.github.io/categories/hardware">hardware</a><a class="label" href="http://allincamera.github.io/categories/software">software</a><a class="label" href="http://allincamera.github.io/categories/system">system</a>
+    </span>
+    
+
+<h2 id="基本概念:a964ef45263c6c27f345fdb68fdb6cb3">基本概念</h2>
+
+<p>成像系统的解析力一直是摄像头最关键的指标之一。所有用户拿到一张照片的时候首先看到的是照片清楚不清楚，这里的清楚说得就是解析力。但是如何评价一个成像系统的解析力也是大家一直在探讨的问题。目前主流的办法主要有三种TV line检测，MTF检测，和SFR 检测。</p>
+
+<h3 id="tv-line:a964ef45263c6c27f345fdb68fdb6cb3">TV line</h3>
+
+<p>TV line主要用于主观测试，也有一些读取TV line的软件如HYRes。但是总体来说没有一个具体的标准。大多数公司是以人的读取为标准。不同人的读取，以及状态的不同都会导致读取值的不稳定。而且如ISO12233 chart 实际上我们读出的线对数只能代表读出位置的状况。尤其中心的TV line跨度很大，很难反映一个成像系统</p>
+
+<h3 id="mtf:a964ef45263c6c27f345fdb68fdb6cb3">MTF</h3>
+
+<p>MTF是Modulation Transfer Function的英文简称，中文为调制传递函数。是指调制度随空间频率变化的函数称为调制度传递函数。个传递函数最开始是为了说明镜头的能力。在各个摄像头镜头中经常采用MTF描述镜头的MTF曲线，表明镜头的能力。这些曲线是通过理想的测试环境下尽量减少其它系统对镜头的解析力的衰减的情况下测试得出的。但是其实MTF也可以涵盖对整个成像系统的解析力评价。在这里咱们就不多讨论这个问题了，如果有兴趣可以开另外一篇文章讨论。</p>
+
+<h3 id="sfr:a964ef45263c6c27f345fdb68fdb6cb3">SFR</h3>
+
+<p>SFR是 spatial frequency response (SFR) 主要是用于测量随着空间频率的线条增加对单一影像的所造成影响。简言之SFR就是MTF的另外一种测试方法。这种测试方法在很大程度上精简了测试流程。SFR的最终计算是希望得到MTF曲线。SFR的计算方法和MTF虽然不同但是在结果上是基本一致的</p>
+
+<h2 id="测量方法:a964ef45263c6c27f345fdb68fdb6cb3">测量方法</h2>
+
+<p>现在我们来看一下传统的MTF是怎么测量出来的，后面我们再针对SFR的原理和MTF的关系进行一些介绍。在以后的文章中我们在介绍一些MTF和SFR测试需要注意的问题。
+从上面我们知道MTF是描述不同空间频率下的调制函数。那么什么是空间频率呢？通常，描述频率的单位是赫兹(Hz)，比如50Hz、100MHz之类的。但空间频率的表述习惯用“每毫米线对”。（LP/mm），就是每毫米的宽度内有多少线对。每两条线条之间的距离，以及线条本身的宽度之比是个定值，目前我国分辨率的标板规定，这个定为公因子是20√10≈1.122等比级数。一般MTF的计算离不开线对。下面这个图就是一张不同频率的线对测试图 ，可以看到图卡本身黑色和白色的对比是很清楚的。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/lp_demo1.gif" alt="LP Demo1" /></p>
+
+<p>实际拍摄的时候，就像上图一样频率越高（越细）的线对就越模糊。这就是我们实际拍摄场景中到一定小的纹理的就拍摄不清楚的原因。而MTF的计算就是计算线对间最亮和最暗线对的对比度。计算公式为</p>
+
+<blockquote>
+<p>MTF = (最大亮度 - 最小亮度) / (最大亮度 + 最小亮度)</p>
+</blockquote>
+
+<p>所以MTF的计算不会出现大于1的情况。像下面的图表示的这样，当我们测试了很多不同频率下的MTF值。通过将这些值和空间频率进行一一的对照。通过这条曲线我们就能知道现在的成像系统在什么样的空间频率下的对比度如何。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/lp_demo2.jpg" alt="LP Demo2" /></p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/lp_demo3.jpg" alt="LP Demo3" /></p>
+
+<p>SFR是怎么测试和计算的呢。首先SFR不需要拍摄不同的空间频率下的线对。它只需要一个黑白的斜边（刀口）即可换算出约略相等于所有空间频率 下的MTF。如何通过一个斜边计算出大家可以去看下ISO12233-2000那篇文档，里面说的很详细。具体的流程如下图。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/sfr_calc.jpg" alt="Calculate SFR" /></p>
+
+<p>其实简单得来说呢，SFR是通过这条斜边的图进行超采样的到一条更加细腻的黑白变换的直线（ESF）。然后通过这条直线求导得到直线的变化率（LSF）。然后对将这个变化率进行FFT变换就能得到各个频率下的MTF的值。这里面的ESF，LSF，都是什么呢?</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/esf_lsf_mtf.jpg" alt="Calculate SFR" /></p>
+
+<p>点扩展函数PSF(Point Spread Function)、线扩展函数LSF(Line Spread Function)和边缘扩展函数ESF(Edge Spread Function)是SFR 计算中的几个重要的概念。点扩展函数PSF是点光源成像后的亮度分布函数，如下图所示，用PSF(X,Y)表示。点扩展函数是中心圆对称的，通常以沿x轴的亮度分布PSF(X,Y)作为成像系统的点扩展函数。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/psf.jpg" alt="Calculate SFR" /></p>
+
+<p>当获取点光源像的亮度分布函数PSF(X,Y)后，对其进行二维傅里叶变换即可得MTF (u，v)。因此，从理论上讲，从PSF也是获取MTF的一个方法。但是，在实际的应用中，由于地面点光源强度很弱，此方法一般较少采用。相对于PSF来说，LSF的能量得到了一定程度的加强。SFR计​算MTF就通过ESF来得到LSF然后进行FFT得到MTF各个频率的值的。这几者之间的关系如下图。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/psf_esf_lsf_mtf.jpg" alt="Calculate SFR" /></p>
+
+<p>说实话光从这几个数学公式还是不好理解为什么ESF可以求出MTF。换一种角度理解LSF就是一条线上（ESF） 的变化的过称。对于任意一条线由黑变白的过程是由不同频率的黑白线对组成。因此可以反过来通过分析一条线得到这些频率下的　（FFT）。当然这只是一种朴素的理解。后面的文章中会有实际使用的MTF和SFR图卡和测试环境和问题进行进一步讨论</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/bottom.jpg" alt="Calculate SFR" /></p>
+
+  </div>
+  <div id="disqus_thread"></div>
+</div>
+
+
+<script type="text/javascript">
+var disqus_shortname = "httpallincameragithubio";
+(function () {
+    var s = document.createElement('script'); s.async = true;
+    s.type = 'text/javascript';
+    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+
+
+
+<script type="text/javascript">
+    var disqus_shortname = "httpallincameragithubio";
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+<script src="http://allincamera.github.io/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</body>
+</html>
+

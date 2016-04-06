@@ -6,8 +6,137 @@
     <description>Recent content on All in Camera</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 05 Apr 2016 11:31:59 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 06 Apr 2016 18:45:10 +0800</lastBuildDate>
     <atom:link href="http://allincamera.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>解析力 （2）空间采样 和 奈奎斯特</title>
+      <link>http://allincamera.github.io/post/resolution_2/</link>
+      <pubDate>Wed, 06 Apr 2016 18:45:10 +0800</pubDate>
+      
+      <guid>http://allincamera.github.io/post/resolution_2/</guid>
+      <description>&lt;p&gt;上一篇也说到MTF曲线的时候横坐标是空间频率。一般使用黑白交替的线对来表示空间频率。而空间频率的单位一般是线对每毫米(lp/mm)，周期每毫米（cycles/mm）,周期每像素（cycles/pixel），线宽每图像高（LW/PH Line Widths per Picture Height），线对每图像高（lp/ph）。其中lp/mm是目前使用最多的单位。cycles/pixel是在数码相机中的成像系统的。数码相机下一个像素就是1 cycles/pixel，两个像素就是0.5 cycles/pixel，4个像素是0.25 cycles/pixel.其它单位的计算如下，纵向是已知横向是未知。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/freq_units.jpg&#34; alt=&#34;Freq Units&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当知道了空间频率的单位之后又有了一个问题。到底用什么样的空间频率去评价MTF合适呢？这个时候经常能看到一个名词奈奎斯特（Nyquist）频率，这是来自采样定律。奈奎斯特和成像有什么关系呢？
+数字相机的Sensor在成像过程中就相当与对镜头成的模拟像进行空间数字采样。
+奈奎斯特采样定理是指在进行模拟与数字信号的转换过程中，当采样频率大于信号中最高频率的2倍时，采样之后的数字信号完整地保留了原始信号中的信息，但是一般实际应用中保证采样频率为信号最高频率的5～10倍。数码相机的Nyquist取决于pixel 的大小.根据前面给出的空间频率单位转换公式。&lt;/p&gt;
+
+&lt;p&gt;对于给定的Pixel size的sensor&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Nyquist 频率= 1000[µm]/（pixel_pitch [µm]X2）&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/nyquist_sample.jpg&#34; alt=&#34;Nyquist Sample&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;评价MTF使用的奈奎斯特频率（Nyquist频率）是离散信号系统采样频率的一半，也就是一个方向上的像素数一半。采样定理指出，只要离散系统的奈奎斯特频率高于被采样信号的最高频率或带宽，就可以避免混叠现象。但这只是理论上。我们先看下一个接近奈奎斯特频率的频率的采样过程。当然下面的成像过程都是基于一个理想的没有MTF衰减的镜头的情况下。我们实际的像素对正弦图卡的采样过程可以模拟为&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/wave_pixel_image.png&#34; alt=&#34;Wave-Pixel-Image&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;而在采样理论中的采样过程中类似下图。两个采样点之间的周器和数字成像系统的像素一样。但是希望采样点能够尽量小。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/wave_idea_sample_image.png&#34; alt=&#34;Wave-Idea-Samples-Image&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;采样定理中的只要小于奈奎斯特频率频率都可以被采样还原是有两个条件的。&lt;/p&gt;
+
+&lt;p&gt;1采样点的尽量小，而我们的像素大小实际上接近于&lt;/p&gt;
+
+&lt;p&gt;2重建信号的过程需要以一个低通滤波器或者带通滤波器将在奈奎斯特频率之上的高频分量全部滤除，同时还要保证原信号中频率在奈奎斯特频率以下的分量不发生畸变。&lt;/p&gt;
+
+&lt;p&gt;这两者在图像系统中都很难满足。因此很多时候即使采样过程中信号的最大频率小于奈奎斯特频率频率依然无法很好的得到采样还原。&lt;/p&gt;
+
+&lt;p&gt;即使选取一个略小于奈奎斯特频率频率的正弦图卡。当发生相差的时候像素就很有可能无法正确采样出来实际图卡的原来的形状。但是多数情况下使用理想的采样模型是可以将原有信号正确的采样出来的，下面两张图是相差的影响对实际像素的采样影响。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/wave_pixel_image2.png&#34; alt=&#34;Wave-Pixel-Image-Phase-Diff&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/wave_idea_sample_image2.png&#34; alt=&#34;Wave-Idea-Samples-Image-Phase-Diff&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;前面提到当频率高于奈奎斯特频率的时候会产生混叠现象。混叠(aliasing) 在信号也称为叠频；在成像上称为叠影，叠影会产生伪纹也就是平常说的摩尔纹。下面的就是一个高于Nyquist频率的频率产生伪纹的采样情况。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/wave_pixel_sample3.png&#34; alt=&#34;Wave-Pixel-High-Freq&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/overlap.jpg&#34; alt=&#34;Overlap&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;从采样的一般规律来说如果要消除上面这些相差和混叠的影响就需要提高采样的频率。对于常用的采样频率我们可以参考示波器。示波器是一个常用的采样系统，一般示波器的采样频率在被采样频率的5到8倍。但是数字成像系统不同于示波器的是采样的频率在感应器被确定了之后就已经定了。更多的我们是希望知道原有图像在什么频率下分析成像系统的品质更合适。图像采样的过程中肯定是频率越低的图像越清晰。但是一般什么频率的图像是采样的清晰度是应该可以很好的分辨呢。根据如下图一样的仿真和经验，一般能很好分辨的频率在每个线对4个像素左右，也就是1/2奈奎斯特频率.。下面两张图是在1/2 Nyquist频率采样的情况&lt;/p&gt;
+
+&lt;p&gt;没有相差的1/2 Nyquist频率采样的情况&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/nyquist_sample_nodiff.png&#34; alt=&#34;No diff&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;有相差的1/2 Nyquist频率采样的情况&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_2/nyquist_sample_1by2.png&#34; alt=&#34;Diff 1/2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我们可以看到在1/2 Nyquist下即使有相差，也可以基本上还原原有图像的形状了。但是这只是仿真像素的采样过程中，在实际测试过程中由于镜头，噪声和测试环境影响在1/2奈奎斯特频率附近测试MTF值很不稳定。因此也经常选取更低1/4奈奎斯特频率作为MTF测试值所选取的频率。不过MTF的评价并不是简单的看一个频率就可以评价一个成像系统的效果，MTF曲线是一个整体。下一篇中将介绍怎么来通过SFR算法得到MTF曲线评价一个手机模组。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>解析力 （1 ）MTF SFR</title>
+      <link>http://allincamera.github.io/post/resolution_1/</link>
+      <pubDate>Wed, 06 Apr 2016 18:19:37 +0800</pubDate>
+      
+      <guid>http://allincamera.github.io/post/resolution_1/</guid>
+      <description>
+
+&lt;h2 id=&#34;基本概念:a964ef45263c6c27f345fdb68fdb6cb3&#34;&gt;基本概念&lt;/h2&gt;
+
+&lt;p&gt;成像系统的解析力一直是摄像头最关键的指标之一。所有用户拿到一张照片的时候首先看到的是照片清楚不清楚，这里的清楚说得就是解析力。但是如何评价一个成像系统的解析力也是大家一直在探讨的问题。目前主流的办法主要有三种TV line检测，MTF检测，和SFR 检测。&lt;/p&gt;
+
+&lt;h3 id=&#34;tv-line:a964ef45263c6c27f345fdb68fdb6cb3&#34;&gt;TV line&lt;/h3&gt;
+
+&lt;p&gt;TV line主要用于主观测试，也有一些读取TV line的软件如HYRes。但是总体来说没有一个具体的标准。大多数公司是以人的读取为标准。不同人的读取，以及状态的不同都会导致读取值的不稳定。而且如ISO12233 chart 实际上我们读出的线对数只能代表读出位置的状况。尤其中心的TV line跨度很大，很难反映一个成像系统&lt;/p&gt;
+
+&lt;h3 id=&#34;mtf:a964ef45263c6c27f345fdb68fdb6cb3&#34;&gt;MTF&lt;/h3&gt;
+
+&lt;p&gt;MTF是Modulation Transfer Function的英文简称，中文为调制传递函数。是指调制度随空间频率变化的函数称为调制度传递函数。个传递函数最开始是为了说明镜头的能力。在各个摄像头镜头中经常采用MTF描述镜头的MTF曲线，表明镜头的能力。这些曲线是通过理想的测试环境下尽量减少其它系统对镜头的解析力的衰减的情况下测试得出的。但是其实MTF也可以涵盖对整个成像系统的解析力评价。在这里咱们就不多讨论这个问题了，如果有兴趣可以开另外一篇文章讨论。&lt;/p&gt;
+
+&lt;h3 id=&#34;sfr:a964ef45263c6c27f345fdb68fdb6cb3&#34;&gt;SFR&lt;/h3&gt;
+
+&lt;p&gt;SFR是 spatial frequency response (SFR) 主要是用于测量随着空间频率的线条增加对单一影像的所造成影响。简言之SFR就是MTF的另外一种测试方法。这种测试方法在很大程度上精简了测试流程。SFR的最终计算是希望得到MTF曲线。SFR的计算方法和MTF虽然不同但是在结果上是基本一致的&lt;/p&gt;
+
+&lt;h2 id=&#34;测量方法:a964ef45263c6c27f345fdb68fdb6cb3&#34;&gt;测量方法&lt;/h2&gt;
+
+&lt;p&gt;现在我们来看一下传统的MTF是怎么测量出来的，后面我们再针对SFR的原理和MTF的关系进行一些介绍。在以后的文章中我们在介绍一些MTF和SFR测试需要注意的问题。
+从上面我们知道MTF是描述不同空间频率下的调制函数。那么什么是空间频率呢？通常，描述频率的单位是赫兹(Hz)，比如50Hz、100MHz之类的。但空间频率的表述习惯用“每毫米线对”。（LP/mm），就是每毫米的宽度内有多少线对。每两条线条之间的距离，以及线条本身的宽度之比是个定值，目前我国分辨率的标板规定，这个定为公因子是20√10≈1.122等比级数。一般MTF的计算离不开线对。下面这个图就是一张不同频率的线对测试图 ，可以看到图卡本身黑色和白色的对比是很清楚的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/lp_demo1.gif&#34; alt=&#34;LP Demo1&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;实际拍摄的时候，就像上图一样频率越高（越细）的线对就越模糊。这就是我们实际拍摄场景中到一定小的纹理的就拍摄不清楚的原因。而MTF的计算就是计算线对间最亮和最暗线对的对比度。计算公式为&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;MTF = (最大亮度 - 最小亮度) / (最大亮度 + 最小亮度)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;所以MTF的计算不会出现大于1的情况。像下面的图表示的这样，当我们测试了很多不同频率下的MTF值。通过将这些值和空间频率进行一一的对照。通过这条曲线我们就能知道现在的成像系统在什么样的空间频率下的对比度如何。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/lp_demo2.jpg&#34; alt=&#34;LP Demo2&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/lp_demo3.jpg&#34; alt=&#34;LP Demo3&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;SFR是怎么测试和计算的呢。首先SFR不需要拍摄不同的空间频率下的线对。它只需要一个黑白的斜边（刀口）即可换算出约略相等于所有空间频率 下的MTF。如何通过一个斜边计算出大家可以去看下ISO12233-2000那篇文档，里面说的很详细。具体的流程如下图。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/sfr_calc.jpg&#34; alt=&#34;Calculate SFR&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其实简单得来说呢，SFR是通过这条斜边的图进行超采样的到一条更加细腻的黑白变换的直线（ESF）。然后通过这条直线求导得到直线的变化率（LSF）。然后对将这个变化率进行FFT变换就能得到各个频率下的MTF的值。这里面的ESF，LSF，都是什么呢?&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/esf_lsf_mtf.jpg&#34; alt=&#34;Calculate SFR&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;点扩展函数PSF(Point Spread Function)、线扩展函数LSF(Line Spread Function)和边缘扩展函数ESF(Edge Spread Function)是SFR 计算中的几个重要的概念。点扩展函数PSF是点光源成像后的亮度分布函数，如下图所示，用PSF(X,Y)表示。点扩展函数是中心圆对称的，通常以沿x轴的亮度分布PSF(X,Y)作为成像系统的点扩展函数。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/psf.jpg&#34; alt=&#34;Calculate SFR&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当获取点光源像的亮度分布函数PSF(X,Y)后，对其进行二维傅里叶变换即可得MTF (u，v)。因此，从理论上讲，从PSF也是获取MTF的一个方法。但是，在实际的应用中，由于地面点光源强度很弱，此方法一般较少采用。相对于PSF来说，LSF的能量得到了一定程度的加强。SFR计​算MTF就通过ESF来得到LSF然后进行FFT得到MTF各个频率的值的。这几者之间的关系如下图。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/psf_esf_lsf_mtf.jpg&#34; alt=&#34;Calculate SFR&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;说实话光从这几个数学公式还是不好理解为什么ESF可以求出MTF。换一种角度理解LSF就是一条线上（ESF） 的变化的过称。对于任意一条线由黑变白的过程是由不同频率的黑白线对组成。因此可以反过来通过分析一条线得到这些频率下的　（FFT）。当然这只是一种朴素的理解。后面的文章中会有实际使用的MTF和SFR图卡和测试环境和问题进行进一步讨论&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/resolution_1/bottom.jpg&#34; alt=&#34;Calculate SFR&#34; /&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>HDR Sensor 原理介绍</title>
