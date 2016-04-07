@@ -88,9 +88,9 @@
     
     <div class="post">
       <h1 class="post-title">
-        <a href="http://allincamera.github.io/post/cdaf_pdaf/">反差对焦 vs. 相差对焦</a>
+        <a href="http://allincamera.github.io/post/cdaf/">反差式对焦评价函数的频率特性考虑</a>
       </h1>
-      <span class="post-date">Apr 7, 2016 &middot; 1 minute read &middot; <a href="http://allincamera.github.io/post/cdaf_pdaf/#disqus_thread">Comments</a>
+      <span class="post-date">Apr 7, 2016 &middot; 1 minute read &middot; <a href="http://allincamera.github.io/post/cdaf/#disqus_thread">Comments</a>
       
       <br/>
       <a class="label" href="http://allincamera.github.io/categories/hardware">hardware</a><a class="label" href="http://allincamera.github.io/categories/software">software</a><a class="label" href="http://allincamera.github.io/categories/system">system</a>
@@ -98,14 +98,12 @@
       
       
 
-<h2 id="反差式对焦评价函数的频率特性考虑:cfd866e8f4e163e652c7275fc6cb4e65">反差式对焦评价函数的频率特性考虑</h2>
-
 <p>当前手机成像系统中普遍使用反差式对焦系统，也就是计算当前图像的锐度，依照图像锐度与镜头位置的关系，寻找最锐度最高的镜头位置作为合焦位置的方法。在搜索策略上各厂商基本相似，在锐度提取也就是清晰度的计算上，应该根据光学特性的不同做差异化设计。</p>
 
 <p>基于芯片硬件设计的方便性考虑，大部分的锐度评价函数都设计为一个m x n算子，记作P，算子的填充决定其特性：一般是高通，或者是带通滤波器。如果图像记作G，那么图像的锐度S可以表示为：
 S = P * G  P 对 G 做卷积。</p>
 
-<h3 id="高通与带通滤波器的优缺点:cfd866e8f4e163e652c7275fc6cb4e65">高通与带通滤波器的优缺点</h3>
+<h3 id="高通与带通滤波器的优缺点:21488b96ffcd9dfd757627af1ef7cae6">高通与带通滤波器的优缺点</h3>
 
 <p>高通滤波器对高频成分很敏感，当成像系统离焦不远时，图像高频成分很容易被提取出来，随着镜头的移动，计算出锐度的差异很明显。但是当图像离焦很远时，比如对焦的物体消失，背景物体又在远处，高通滤波器对图像的响应就不明显，这样镜头移动计算出的锐度变化就不明显，造成搜索失败。</p>
 
@@ -134,11 +132,22 @@ S = P * G  P 对 G 做卷积。</p>
 
 <p>上图就是上面的各个滤波器的仿真结果，横坐标是离焦程度，从0到25，离焦程度逐步变大。纵坐标是计算出的锐度值，1表示最大。通过这个曲线，可以看出对不同离焦程度图像滤波器的响应，依据响应曲线的特点进行选择。</p>
 
-<h2 id="片上相差式自动对焦-on-chip-phase-detection-autofocus-原理:cfd866e8f4e163e652c7275fc6cb4e65">片上相差式自动对焦（on chip phase detection autofocus）原理</h2>
+      
+    </div>
+    
+    <div class="post">
+      <h1 class="post-title">
+        <a href="http://allincamera.github.io/post/pdaf/">片上相差式自动对焦原理</a>
+      </h1>
+      <span class="post-date">Apr 7, 2016 &middot; 1 minute read &middot; <a href="http://allincamera.github.io/post/pdaf/#disqus_thread">Comments</a>
+      
+      <br/>
+      <a class="label" href="http://allincamera.github.io/categories/hardware">hardware</a><a class="label" href="http://allincamera.github.io/categories/software">software</a><a class="label" href="http://allincamera.github.io/categories/system">system</a>
+      </span>
+      
+      <p>相差式自动对焦与反差式自动对焦是现在手机成像系统中两大主要自动对焦方式。相比反差式自动对焦，相差式自动对焦只需要一次计算，就可以完成对焦。</p>
 
-<p>相差式自动对焦与反差式自动对焦是现在手机成像系统中两大主要自动对焦方式。相比反差式自动对焦，相差式自动对焦只需要一次计算，就可以完成对焦。</p>
-
-<p>当前比较流行的是片上相差自动对焦, 在生产sensor的时候，把某些用于相位检测像素遮住左边一半或者右边一半，如下图</p>
+<p>当前比较流行的是片上相差自动对焦（on chip phase detection autofocus）, 在生产sensor的时候，把某些用于相位检测像素遮住左边一半或者右边一半，如下图</p>
 
 <p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/cdaf_pdaf/focus_pixel_array.png" alt="Focus Pixels Array" /></p>
 
