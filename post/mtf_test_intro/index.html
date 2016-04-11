@@ -1,0 +1,188 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.15" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title> 镜头MTF测试解析 &middot; All in Camera </title>
+
+  
+  <link rel="stylesheet" href="http://allincamera.github.io/css/poole.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/syntax.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="All in Camera" />
+</head>
+
+	<body class="">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://allincamera.github.io/"><h1>All in Camera</h1></a>
+      <p class="lead">
+      An elegant open source and mobile first theme for <a href="http://hugo.spf13.com">hugo</a> made by <a href="http://twitter.com/mdo">@mdo</a>. Originally made for Jekyll.
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      
+    </ul>
+
+    <p>&copy; 2016. All rights reserved. </p>
+  </div>
+</div>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>镜头MTF测试解析</h1>
+			  <span class="post-date">Mon, Apr 11, 2016</span>
+			      
+
+<p>本文特邀在镜头制造行业资深专家Jerry Li为大话成像（All in camera ）撰写。</p>
+
+<h2 id="引言:754679329a565ba3bd547f760dbb0738">引言</h2>
+
+<p>成像清晰度是镜头优劣的重要指标之一，在镜头制造业笔者见过简易的逆投影以及更精准的镜头MTF测试，本文要讲述的是后者设备测试原理及如何通过测试数据判断镜头的品质。</p>
+
+<p>测量MTF的设备，首先需要一个极微小发光体，通过被检测镜头成像，然后选择合适的高倍物镜放大并成像到设备CCD上，将图像传输到电脑用专用软件分析光强度分布，最终通过傅里叶变换计算得出MTF。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_test_setup.png" alt="MTF Test Setup" /></p>
+
+<h2 id="测试光源:754679329a565ba3bd547f760dbb0738">测试光源</h2>
+
+<p>MTF 测试中常用三种发光体：点，狭缝，刃边。以下将逐一介绍如何用这三种光源。</p>
+
+<h3 id="点光源:754679329a565ba3bd547f760dbb0738">点光源</h3>
+
+<p>一个理想的点光源可以看成是XY方向上无限小的物体，其能量分布用二维脉冲函数δ(x, y)来表示。理想的点光源经过由像差的光学系统后，所成的像会形成一个弥散斑，其光强分布即光学系统的脉冲响应，也被称作点扩散函数PSF(x, y)。如下图所示。 </p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/point_light_source.png" alt="Point Light source Image" /></p>
+
+<p>我们用一个与位置有关的函数h(x, y)来表示脉冲响应的光强分布，用“*”表示成像过程的卷积操作，则一个理想输入f(x, y)经过光学系统成像后再像面的强度分布g(x, y)可以表示成：</p>
+
+<blockquote>
+<p>g(x, y) = f(x, y)*h(x, y)</p>
+</blockquote>
+
+<p>对上式两端分别进行二维傅里叶变换，有</p>
+
+<blockquote>
+<p>G(fx, fy) = F(fx, fy)H(fx, fy)</p>
+</blockquote>
+
+<p>式中，G(fx, fy)，F(fx, fy)和H(fx, fy)分别是g(x, y)，f(x, y)和h(x, y)的傅里叶变换，fx和fy是频域中沿两个坐标方向的空间频率。函数H(fx, fy)就是我们要求得到的光学传递函数（OTF）。OTF是一个包括实数和虚数两部分的复变函数，可以写成下述公式：</p>
+
+<blockquote>
+<p>OTF(fx, fy) = |H(fx, fy)|expφ(fx, fy)</p>
+</blockquote>
+
+<p>其中，实数部分|H(fx, fy)|就是我们要得到的MTF。</p>
+
+<h3 id="狭缝光源:754679329a565ba3bd547f760dbb0738">狭缝光源</h3>
+
+<p>因为点光源提供的能量较弱，而且得到理想的点光源也比较困难，所以常用的方法是用狭缝来产生线光源。如下图，多个点光源（间隔无限小）假设沿y方向排列形成一维光源，各发光点不相干，则等效狭缝可以看成y方向为常量，以x为变量的delta函数。可以用下式表示：</p>
+
+<blockquote>
+<p>f(x,y) = δ(x)l(y)</p>
+</blockquote>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/slit_line_light_source.png" alt="Slit Line light source" /></p>
+
+<p>狭缝的沿X方向的光强度分布就是线扩散函数LSF，所以狭缝成像的光强度分布g(x, y)可以表示成：</p>
+
+<blockquote>
+<p>g(x, y) = LSF(x) = f(x, y)*h(x, y) = [δ(x)l(y)]*PSF(x, y)</p>
+</blockquote>
+
+<h3 id="刃边光源:754679329a565ba3bd547f760dbb0738">刃边光源</h3>
+
+<p>如果在某些条件下狭缝提供的能量还是不够，那么就需要用到刃边作为光源体，通过边缘扩散函数ESF求导得到LSF，间接计算出MTF。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/esf_lsf_mtf.png" alt="Edge Method" /></p>
+
+<p>点光源、狭缝、刃边的测试方法除了提供能量不同之外，差异还包括点光源可以同时计算任意角度的多个方向的MTF，狭缝和刃边一次只能计算一个方向的MTF。由于CCD采集信号噪声的影响，狭缝相比点光源有更高的测量精度，刃边比狭缝多了一次求导，会使得噪声增加。所以三者相比之下，狭缝LSF是比较稳定的测量MTF方法，德国trioptics公司使用的就是狭缝LSF测量法。 </p>
+
+<h2 id="mtf分析实例:754679329a565ba3bd547f760dbb0738">MTF分析实例</h2>
+
+<p>因为暂时没有模拟LSF图像的方法，下面笔者以点光源模拟成像和模拟计算MTF的数据来说明如何分析MTF。</p>
+
+<p>选用镜头规格 <sup>1</sup>&frasl;<sub>2</sub>.6” I.H=3.432mm, F2.2, FL=4.42mm。</p>
+
+<p>镜头放置在测量设备上（假设点光源在物体侧），设备机构如果事先有校正，测试开始后，应该很容易找到中心视场成像如下，随后设备会测量中心点像的离焦MTF，过程模拟如下：</p>
+
+<p>a) 搜索到中心视场的点像，记录下此时defocus位置P0</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/defocus_p0.jpg" alt="Defocus P0" /></p>
+
+<p>b) 从P0 - 0.03位置开始摄取点像并计算MTF，假定step为0.01，测到P0 + 0.03。
+（如果焦深很大，则P0两侧的defocus测定范围也要相应的扩大）</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/defocus_spots.png" alt="Defocus Spots" /></p>
+
+<p>7个defocus位置的MTF近似绘制MTF through focus曲线，设备软件计算出peak位置，并移动物镜对焦在peak位置上</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_thru_focus.png" alt="MTF Through Focus" /></p>
+
+<p>如果测量的是mtf vs field(0~1.0field，step 0.1field)，那么接下来测量过程如下：</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_vs_field.png" alt="MTF vs. field" /></p>
+
+<p>因为是点光源，所以T.S两个方向一次全部计算出来了，各视场MTF连起来曲线如下:</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_vs_focus_curve.png" alt="MTF vs. focus" /></p>
+
+<p>这个过程同样可以输出mtf vs frequency如下：</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_vs_freq.png" alt="MTF vs. freq" /></p>
+
+<p>如果要测量周边视场的mtf through focus曲线，则每个视场都要重复步骤b。</p>
+
+<p>1.0field T.S example</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/defocus_spots2.png" alt="Defocus spots example" /></p>
+
+<p>各defocus的MTF连起来即为下图。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/defocus_mtf_curve.png" alt="Defocus MTF curves" /></p>
+
+<p>以上即为MTF实际测量的过程，原理很简单。鉴于以上MTF及点像是镜头设计值输出，下面输出一组包含tolerance的数据。为简化输出，field设定+/- 0.8, +/-0.6, +/-0.4, center。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/defocus_spots_sample.png" alt="Defocus Spots Sample" /></p>
+
+<p>其MTF vs field数据如下，是颗很差的镜头，尤其是T方向差。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_vs_field_sample.png" alt="MTF vs. filed smaple" /></p>
+
+<p>各视场MTF through focus数据如下：</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_through_focus_sample1.png" alt="MTF thru focus 1" /></p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_through_focus_sample2.png" alt="MTF thru focus 2" /></p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_through_focus_sample3.png" alt="MTF thru focus 3" /></p>
+
+<p>从mtf through focus曲线看出，像面tilt是MTF NG的主要原因。以+/- 0.8F为例，我们看看through focus的点像如何。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/mtf_test_intro/mtf_thru_focus_spots_samples.png" alt="MTF thru focus spots" /></p>
+
+<p>从上图很容易看出，Y轴方向代表T，-0.8field在defocus-0.01是Y方向光线汇聚最佳的，而+0.8field在defocus 0.02的时候Y方向最汇聚，但是X方向却发散，意味着S方向在defocus +0.01汇聚最佳。要矫正+/- 0.8field，可以选择倾斜sensor，使sensor image plane 正方向落在defocus 0.01mm位置，而负方向落在-0.01mm，此时系统拥有最佳的组合解析力。因此镜头的测试不仅可以鉴别镜头的质量也可以为成像系统的设计增加更多依据。</p>
+
+			</div>
+
+			
+		</div>
+
+  </body>
+</html>
