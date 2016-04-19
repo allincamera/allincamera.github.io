@@ -17,7 +17,7 @@
       <guid>http://allincamera.github.io/post/noise_and_denoise1/</guid>
       <description>
 
-&lt;p&gt;&lt;strong&gt;本文系本站微信公众号《大话成像》，知乎专栏《大话成像 all in camera》原创文章，转载请注明出处。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;本文系微信公众号《大话成像》，知乎专栏《大话成像 all in camera》原创文章，转载请注明出处。&lt;/strong&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;噪声分类:a6abbaf212851257f798600f7bb6b968&#34;&gt;噪声分类&lt;/h2&gt;
 
@@ -44,7 +44,7 @@
 
 &lt;p&gt;均值 &lt;code&gt;$\mu = \dfrac {\sum^{n}_{i=1}X_{i}}{n}$&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;标准差 &lt;code&gt;$sigma=\dfrac {1}{n-1}\sum ^{n}_{i=1}\left(u-x{i}\right)^{2}$&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;标准差 &lt;code&gt;$\sigma=\dfrac {1}{n-1}\sum ^{n}_{i=1}\left(u-x{i}\right)^{2}$&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;图像的标准差可以作为图像噪声水平的评价值。&lt;/p&gt;
 
