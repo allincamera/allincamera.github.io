@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Software on All in Camera</title>
+    <link>http://allincamera.github.io/tags/software/</link>
+    <description>Recent content in Software on All in Camera</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 19 Apr 2016 18:55:14 +0800</lastBuildDate>
+    <atom:link href="http://allincamera.github.io/tags/software/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>图解噪声与去噪 之一： fix pattern noise（FPN）与 temporal noise</title>
+      <link>http://allincamera.github.io/post/noise_and_denoise1/</link>
+      <pubDate>Tue, 19 Apr 2016 18:55:14 +0800</pubDate>
+      
+      <guid>http://allincamera.github.io/post/noise_and_denoise1/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;本文系本站微信公众号《大话成像》，知乎专栏《大话成像 all in camera》原创文章，转载请注明出处。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;噪声分类:a6abbaf212851257f798600f7bb6b968&#34;&gt;噪声分类&lt;/h2&gt;
+
+&lt;p&gt;噪声有很多种分类方法，比如从频率上分，可以分为高频，中频，低频噪声。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/no_noise.label.png&#34; alt=&#34;No Noise&#34; /&gt;
+&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/high_freq_noise.label.png&#34; alt=&#34;High Frequency Noise&#34; /&gt;
+&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/mid_freq_noise.label.png&#34; alt=&#34;Mid Frequency Noise&#34; /&gt;
+&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/low_frequency_noise.label.png&#34; alt=&#34;Low Frequency Noise&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;从色彩空间上分，可以分为luma noise亮度噪声与chroma noise彩色噪声。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/luma_chroma_noise.wm.jpg&#34; alt=&#34;Luma Chroma Noise&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;从时态上分，可以分为fix pattern noise与temporal noise。Fix pattern noise 与时间无关，表现上看就是噪声幅度不随时间变化。Temporal noise是随时间变化，在低光下录制的视频中不断变化的细小信号就是temporal noise。&lt;/p&gt;
+
+&lt;p&gt;也有的分法把fix pattern noise定义为在图像行或者列存在的一条条的噪声，如下图所示。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/fix_pattern_noise.label.png&#34; alt=&#34;Fix Pattern Noise&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Temporal noise视觉上是一种高频噪声。&lt;/p&gt;
+
+&lt;h2 id=&#34;噪声计算:a6abbaf212851257f798600f7bb6b968&#34;&gt;噪声计算&lt;/h2&gt;
+
+&lt;p&gt;均值 &lt;code&gt;$\mu = \dfrac {\sum^{n}_{i=1}X_{i}}{n}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;标准差 &lt;code&gt;$sigma=\dfrac {1}{n-1}\sum ^{n}_{i=1}\left(u-x{i}\right)^{2}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;图像的标准差可以作为图像噪声水平的评价值。&lt;/p&gt;
+
+&lt;p&gt;按照如下曝光时间，每个曝光时间拍30张black 照片。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-matlab&#34;&gt;	exp_time = [0.063, 1.003,16, 64,257,513,770,1027,1283,1540,1797,2054];
+	raw_avg = 0;
+	for kk = 0:30:(30*12-1)
+	    for i = 1:30
+	        fname = fileNames{kk+i};      
+	        fprintf(&#39;processing %s %d\n&#39;, fname, kk+i);
+	        raw = double(imread([fold fname]));
+	        raw = raw(:,:,1);
+	        raw_avg = raw + raw_avg;  
+	    end
+	    raw_avg = raw_avg./30; 
+	    
+	    avg_signal((kk/30)+1) = round(mean2(raw_avg));
+	    fpn_total((kk/30)+1) = std2(raw_avg);
+	     
+	    fpn_col_exp((kk/30)+1) = std(mean(raw_avg,1));
+	%     avg_sig_col_exp((kk/30)+1,:) = mean(raw_avg,1);
+	    
+	    fpn_row_exp((kk/30)+1)     = std(mean(raw_avg,2)&#39;);
+	%     avg_sig_row_exp((kk/30)+1) = mean(raw_avg,2)&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如上计算，可以得到图像的平均信号，每个曝光的FPN noise，以及行，列FPN noise,行列均值。
+&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/avg_sig_total_fpn.wm.png&#34; alt=&#34;Average Signal and total FPN&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;把曝光逐渐增加，确保图像能够达到饱和，在10个曝光值，每个曝光值下拍30张flat field照片&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-matlab&#34;&gt;	raw_avg = 0;
+	temp_noise = zeros(30,480*752);
+	for kk = 0:30:(30*11-1)
+	    for i = 1:30
+	        fname = fileNames{kk+i};
+	        fprintf(&#39;processing %s %d\n&#39;, fname, kk+i);
+	        raw = double(imread([fold fname]));
+	        raw = raw(:,:,1);
+	        raw_avg = raw + raw_avg;
+	        temp_noise(i,:) = raw(:)&#39;;
+	    end
+	    raw_avg = raw_avg./30;
+	    
+	    std_temp_noise = std(temp_noise,1);
+	    
+	    avg_signal((kk/30)+1) = round(mean2(raw_avg));
+	    temporal_total((kk/30)+1) = median(std_temp_noise);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如上计算，可以得到图像的temporal noise&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/total_temporal.wm.png&#34; alt=&#34;Total Temporal&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;最后图像饱和，所以噪声降低至0。&lt;/p&gt;
+
+&lt;p&gt;FPN noise是相关噪声，temporal noise是不相关噪声。&lt;/p&gt;
+
+&lt;p&gt;两个图像相加：&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;$S = S_1 + S_2$&lt;/code&gt; S代表信号&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;$\sigma^{2}_{t}=\sigma^{2}_{t1}+\sigma^{2}_{t2}$&lt;/code&gt; &lt;code&gt;$\sigma_{t}$&lt;/code&gt; 代表temporal noise&lt;/p&gt;
+
+&lt;p&gt;信噪比SNR &lt;code&gt;$\dfrac {S}{\sigma_{t}}=\dfrac {S_{1}+S_{2}}{\left(\sigma^{2}_{t1}+\sigma^{2}_{t2}\right)^{0.5}}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;当 &lt;code&gt;$S_{1} = S_{2}$&lt;/code&gt; , &lt;code&gt;$\sigma_{t1} = \sigma_{t2}$&lt;/code&gt;, 信噪比SNR &lt;code&gt;$\dfrac {S}{\sigma_{t}}=2^{0.5}\dfrac{S_{1}}{\sigma_{t1}}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;当 &lt;code&gt;$S_{1} = S_{2}=...=S_{n}$&lt;/code&gt; , 信噪比SNR &lt;code&gt;$\dfrac {S}{\sigma_{t}}=n^{0.5}\dfrac{S_{1}}{\sigma_{t1}}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;该公式从理论上证明了n帧平均会降低temporal noise &lt;code&gt;$n^{0.5}$&lt;/code&gt; 倍。所以信号处理中去除temporal noise的方法就是多帧平均加运动检测，如果存在图像存在变化就不累加，如果图像无变化就累加平均。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise1/frame_average.wm.png&#34; alt=&#34;Frame Average&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;而FPN noise 是相关噪声&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;$\sigma_{fpn} = \sigma_{fpn1} + \sigma_{fpn2}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;$S = S_{1} + S_{2}$&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;$ \dfrac {S}{\sigma_{fpn}} = \dfrac {S_{1}+S_{2}}{\sigma_{fpn1}+\sigma_{fpn2}} $&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;当 &lt;code&gt;$ S_{1} = S_{2} $&lt;/code&gt;, &lt;code&gt;$ \sigma_{fpn1} = \sigma_{fpn2} $&lt;/code&gt; 时， &lt;code&gt;$ \dfrac {S}{\sigma_{fpn}} = \dfrac {S_{1}}{\sigma_{fpn1}} $&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;多帧平均不会降低FPN。&lt;/p&gt;
+
+&lt;p&gt;通过上图可以看出，经过多帧平均后，噪声的floor变成了FPN。&lt;/p&gt;
+
+&lt;p&gt;通过多帧平均可以分离temporal noise和FPN，然后用其他信号处理的方法去除FPN，下一篇将介绍去噪的Spacial domain 和 transform domain的方法。&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
