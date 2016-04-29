@@ -6,8 +6,134 @@
     <description>Recent content in Hardware on All in Camera</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 07 Apr 2016 13:32:07 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 30 Apr 2016 00:44:57 +0800</lastBuildDate>
     <atom:link href="http://allincamera.github.io/categories/hardware/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>【科普】双摄像头能做什么？</title>
+      <link>http://allincamera.github.io/post/dual_cam_intro_01/</link>
+      <pubDate>Sat, 30 Apr 2016 00:44:57 +0800</pubDate>
+      
+      <guid>http://allincamera.github.io/post/dual_cam_intro_01/</guid>
+      <description>
+
+&lt;p&gt;&lt;strong&gt;本文系微信公众号『大话成像』，知乎专栏『all in camera』原创文章，转载请注明出处并保留本声明&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;目前主流的双摄像头的功能。主要可以分为两大类：
+1. 利用双摄像头产生立体视觉，获得影像的景深。以及利用将不同的景深进行3D建模，图像处理，物体分割，物体识别和跟踪，对焦辅助之类的功能
+2. 利用左右两张不同的图片信息进行融合，以期望得到更高的分辨率，更好的色彩，动态范围等更好的图像质量。&lt;/p&gt;
+
+&lt;p&gt;这两类双摄像头功能对于摄像头的硬件有着不同的要求，前者要求两个摄像头得到像差尽量大，这样能够得到的景深精度更高，因此前者的硬件希望两个摄像头间的距离比较远才好。而后者希望两个摄像头的像在空间和时间上都尽量能够接近，因此在硬件设计的时候希望两个摄像头离得比较近。这样在两个图像融合的时候才不会因为相差产生更多的错误。&lt;/p&gt;
+
+&lt;p&gt;但是由于摄像头无法做的完全一致。因此无论是这两类功能的哪一类，算法都希望能在得到图像的同时，能够更多的得到硬件的实际情况如：姿势差和两个摄像头的镜头畸变等。而这些信息需要平台算法和模组生产手机生产使用相同且方便于工程化的算法进行计算，很多牵扯到硬件本身的特性，不是简单从理论计算就能解决的。以后有时间我们会继续讨论这个话题。总之双摄像头的使用过程中算法和硬件本身结合的十分紧密，不可分割。因此说到双摄像头现在首先应该关注的应该是双摄像头能带来什么样的用户体验。双摄像头中对软件硬件结合的要求远比单摄像头要高。而我们在看到一款使用双摄像头的手机的时候从它的硬件设计就能看出它是偏重于哪一类功能。下图就是常见的两个摄像头在姿势差上面的信息。就是针对3D坐标轴XYZ的平移和旋转。后面面我们把双摄像头的能实现功能给大家介绍。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/dualcam_module.png&#34; alt=&#34;Dual Cam Module&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;景深应用:681b06908344f27af169accd314408b0&#34;&gt;景深应用&lt;/h2&gt;
+
+&lt;p&gt;第一类功能首先要获得当前场景的景深图。其基本原理就是基于三角定位。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/depth_calc.jpg&#34; alt=&#34;Depth Calc&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;背景虚化:681b06908344f27af169accd314408b0&#34;&gt;背景虚化&lt;/h3&gt;
+
+&lt;p&gt;第一类功能中最典型的就是背景虚化，在景深图的基础上将不同距离的物体进行虚化，模拟大光圈相机拍摄效果。&lt;/p&gt;
+
+&lt;p&gt;该功能在以前的双camera中经常能见到，如HTC的后置双摄和联想前置双摄S1。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/depth_blur.jpg&#34; alt=&#34;Depth Blur&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;物体分割:681b06908344f27af169accd314408b0&#34;&gt;物体分割&lt;/h3&gt;
+
+&lt;p&gt;目前在手机上主要用于图片的裁减，和背景替换，利用景深信息可以更好的可以将不同景深的物体分割开。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/depth_split.png&#34; alt=&#34;Depth Split&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;3d扫描:681b06908344f27af169accd314408b0&#34;&gt;3D扫描&lt;/h3&gt;
+
+&lt;p&gt;通过不同角度下的景深图进行建模。这对景深图和算法的要求比较高。手机上的双camera之间的距离有限往往能够得到的景深图的精度不够好，景深信息处理算法复杂在手机硬件上计算的时间长，因此目前这个功能在手机上面基本没有。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/3d_model.png&#34; alt=&#34;3D Scanning&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;目标物体距离计算和快速对焦:681b06908344f27af169accd314408b0&#34;&gt;目标物体距离计算和快速对焦&lt;/h3&gt;
+
+&lt;p&gt;利用三角定位计算景深的最简单的应用&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/fast_focus.png&#34; alt=&#34;fast focus&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;3d视频及照片制作:681b06908344f27af169accd314408b0&#34;&gt;3D视频及照片制作&lt;/h3&gt;
+
+&lt;p&gt;不同于一般的3D电影的拍摄。手机上的两个摄像头无法在图像的拍摄过程中就产生足够的视觉差，这是由于两个摄像头中间的距离和人眼不一样。而且为了能够让人们更明显的得到3D视觉效果。所以往往需要算法进行增强。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/3d_video.jpg&#34; alt=&#34;3D Photo&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ar增强和动作识别:681b06908344f27af169accd314408b0&#34;&gt;AR增强和动作识别&lt;/h3&gt;
+
+&lt;p&gt;主要是利用两个摄像头进行手势或者姿势的识别。目前在市场上比较常见的就是leap motion 还有微软的 Kinect 都是类似的功能。亚马逊fire phone 曾经尝试在手机上实现类似的功能，但是最终手机的供电以及空间并没有给用户良好的体验。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/3d_gesture.jpg&#34; alt=&#34;3D Gesture&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;图像合成:681b06908344f27af169accd314408b0&#34;&gt;图像合成&lt;/h2&gt;
+
+&lt;p&gt;第二类功能都是通过将不同的图片中的不同的信息，合成到一张图片中，使合成之后的图片得到更好的效果。此类应用硬件设计中就会注意如何分别提供不同的信息。&lt;/p&gt;
+
+&lt;h3 id=&#34;超分辨率:681b06908344f27af169accd314408b0&#34;&gt;超分辨率&lt;/h3&gt;
+
+&lt;p&gt;主要是利用多张图片中在高频部分不同的内容生成一张清晰的图片，双camera可以通过两张照片中不同的信息进行最后的增强。&lt;/p&gt;
+
+&lt;p&gt;然而传统算法生成需要的图片一般都是需要更多的图片，两张图片能够提供的不同信息还是太少，如华为的Mate6 plus号称是两颗8M可以合成13M的图像，但是实际拍摄的图像的解析力还只是8M的水平，和我们自己缩放一张图片并没有什么区别。&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;有关解析力的区别可参阅往期解析力测试相关内容&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/super_resolution.jpg&#34; alt=&#34;Super Resolution&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;hdr:681b06908344f27af169accd314408b0&#34;&gt;HDR&lt;/h3&gt;
+
+&lt;p&gt;对两个Camera设置不同的曝光参数以得到不同曝光参数的图像进行HDR合成。&lt;/p&gt;
+
+&lt;p&gt;以往这个功能需要通过以往一个摄像头去修改曝光时间来得到不同曝光情况下的图片，但是这种办法需要的时间长。这不仅导致了用户体验变差，且如果场景中有运动物体或者相机有移动的话会导致鬼影的问题。利用双camera则能避免类似的问题。但是大多数合成的过程中多数的HDR算法主要关注于亮度信息，多数的算法在颜色方面会有些失真。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/hdr.wm.png&#34; alt=&#34;HDR Sample&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;低光提亮和去噪:681b06908344f27af169accd314408b0&#34;&gt;低光提亮和去噪&lt;/h3&gt;
+
+&lt;p&gt;低光提亮和去噪在算法上和HDR基本没有区别。主要是利用两颗摄像头中一颗&lt;strong&gt;黑白摄像头&lt;/strong&gt;的低光下响应较好噪声较小的特性。&lt;/p&gt;
+
+&lt;p&gt;其优点是对于彩噪有不错的抑制性一般能够3个DB左右的SNR提高，但是实际拍摄的图片多数情况下效果提升有限，和有些在低光下做过特殊处理和tuning的单camera系统比并没有很明显的优势。&lt;/p&gt;
+
+&lt;p&gt;华为P9这一次主要就采用了这种camera的设计，从多数我们看到的网上的评价来看目前在低光下的效果有改进但并不惊艳。在华为P9之前，奇酷也采用类似的硬件设计实现这个功能。&lt;/p&gt;
+
+&lt;p&gt;这个功能目前看给用户的提升很有限，也许后面还有挖掘的潜力。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/low_light.wm.png&#34; alt=&#34;Low Light&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;光学变焦:681b06908344f27af169accd314408b0&#34;&gt;光学变焦&lt;/h3&gt;
+
+&lt;p&gt;最近比较好的应用趋势是利用一颗正常的FOV的摄像头模组和一颗远焦镜头的模组达到光学变焦的效果。&lt;/p&gt;
+
+&lt;p&gt;从苹果收购以色列的Linx公司还有苹果公司最新公布的专利来看，水果公司最新的专利来看这个功能很可能是水果公司的双camera的主要功能。远焦镜头的视场角要比正常的镜头小很多，但是相同距离下图片的解析力也会高不少。利用远焦镜头可以提供的较好的分辨率既可以在平时拍照的时候利用融合算法提高中心区域的分辨率，也可以在变焦时利用远焦的照片提高ZOOM后的解析力。从之前看到过的另外一家以色列公司CP的算法效果来看，如果手机上实现的好的话可能在中心区域超过现有手机摄像头最大的解析力，在效果上和光学zoom相差不大。虽然这个功能在硬件设计的时候有着远焦模组过高的问题，但是这依然是第二类功能中目前能看到效果最好的功能。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/dual_cam_intro_01/optical_zoom.jpg&#34; alt=&#34;Optical Zoom&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;现状总结:681b06908344f27af169accd314408b0&#34;&gt;现状总结&lt;/h2&gt;
+
+&lt;p&gt;从目前市面上能看到双Camera手机来看：&lt;/p&gt;
+
+&lt;p&gt;偏景深类功能的手机目前主要的问题是景深信息不够准确计算速度慢。无法实时得到景深信息。不过目前手机硬件的发展速度很快，很多ISP的设计已经开始考虑双camera的实时景深。今年很多实时景深的ISP将开始在平台端普及，虽然分辨率还不是很理想。但是随着实时景深的普及，景深信息的分辨率的增加，相信后面利用景深信息实现的场景物体识别类的功能相信会越来越多。类似我们之前看电影中的一些现实增强的效果我相信 也会越来越多。而且这类功能在智能机器人领域也是目前的热门。如陪李总理的打球的机械人就是这类功能的延伸。不过进入平常百姓家这个肯定需要时间。&lt;/p&gt;
+
+&lt;p&gt;而偏第二类图片融合得到更好图像质量的功能，从目前已有的手机来看都不是很成功。不过实现光学变焦的效果从算法效果的层面上来看效果很不错,或许苹果的双摄出来之后能在这个领域带起一个风潮。&lt;/p&gt;
+
+&lt;p&gt;两类应用对摄像头模组要求是不同的，前者要求模组间的距离较大为好，后者则要求模组间的距离尽量小。虽然无论做的多小但由于模组本身的尺寸，两个摄像头间肯定会有些距离的。比如华为P9两个摄像头间的距离已经小于1厘米，但是再想做的更小可能需要突破性的设计。&lt;/p&gt;
+
+&lt;p&gt;当然，为其中一类功能设计的双摄像头模组也可以实现另外一类功能，只是勉强实现会增加算法的复杂程度，在最终实现的效果上也会受到很大制约。比如P9虽然也实现了景深功能但效果和专门为景深功能功能设计的双摄像头比还是很有差距的。&lt;/p&gt;
+
+&lt;p&gt;双摄像头的风潮刚刚开始，后续我们会邀请不同领域的专家来介绍双摄像头实现的一些具体问题。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;本文系微信公众号『大话成像』，知乎专栏『all in camera』原创文章，转载请注明出处并保留本声明&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>反差式对焦评价函数的频率特性考虑</title>
