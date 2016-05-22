@@ -74,38 +74,29 @@
 &lt;p&gt;以上证明了噪声模型的数学实现性，真正应用的噪声模型比上述基本模型要复杂一些。有了噪声的数学模型，就可以用统计学的方法，针对这两种不同的噪声模型进行处理。
 具体的过程如下：&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;先得到一个sensor的噪声profile(标准差 对 亮度）&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;1&amp;gt;  先得到一个sensor的噪声profile(标准差 对 亮度）&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/sensor_noise_profile.wm.png&#34; alt=&#34;Sensor Noise Profile&#34; /&gt;&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;利用之前说的泊松-高斯模型做curve fitting&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;2&amp;gt;  利用之前说的泊松-高斯模型做curve fitting&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/curve_fitting.wm.png&#34; alt=&#34;Curve fitting&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;RGB三个通道有三个不同的响应，三个不同的fitting曲线。&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;Variance Stabilization&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;3&amp;gt;  Variance Stabilization&lt;/p&gt;
 
 &lt;p&gt;在噪声建模的论文中都用这个词Stabilization&amp;ndash;稳定化。实际上我的理解就是把噪声对亮度做‘归一化’。因为在现在的信号处理方法中，信号依赖性的噪声处理起来非常不便。所以需要把噪声对亮度做归一化。这样就需要根据前边的fitting curve产生conversion function curve。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/conversion_function_curve.wm.jpg&#34; alt=&#34;Conversion Function Curve&#34; /&gt;&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;把conversion function curve 作用到原始信号就会得到噪声归一化的信号：&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;4&amp;gt;  把conversion function curve 作用到原始信号就会得到噪声归一化的信号：&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/variance_stabilization.wm.jpg&#34; alt=&#34;Variance Stabilization&#34; /&gt;&lt;/p&gt;
 
-&lt;ol&gt;
-&lt;li&gt;用常用的去噪方法，比如wiener filter and dct, bm3d, wavelet-based 方法, nlmeans 进行去噪&lt;/li&gt;
-&lt;li&gt;做完去噪，再做反变换，就可以恢复成原始的信号&lt;/li&gt;
-&lt;/ol&gt;
+&lt;p&gt;5&amp;gt;  用常用的去噪方法，比如wiener filter and dct, bm3d, wavelet-based 方法, nlmeans 进行去噪&lt;/p&gt;
+
+&lt;p&gt;6&amp;gt;  做完去噪，再做反变换，就可以恢复成原始的信号&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;参考文献：&lt;/strong&gt;&lt;/p&gt;
 

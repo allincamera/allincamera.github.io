@@ -149,38 +149,29 @@
 <p>以上证明了噪声模型的数学实现性，真正应用的噪声模型比上述基本模型要复杂一些。有了噪声的数学模型，就可以用统计学的方法，针对这两种不同的噪声模型进行处理。
 具体的过程如下：</p>
 
-<ol>
-<li>先得到一个sensor的噪声profile(标准差 对 亮度）</li>
-</ol>
+<p>1&gt;  先得到一个sensor的噪声profile(标准差 对 亮度）</p>
 
 <p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/sensor_noise_profile.wm.png" alt="Sensor Noise Profile" /></p>
 
-<ol>
-<li>利用之前说的泊松-高斯模型做curve fitting</li>
-</ol>
+<p>2&gt;  利用之前说的泊松-高斯模型做curve fitting</p>
 
 <p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/curve_fitting.wm.png" alt="Curve fitting" /></p>
 
 <p>RGB三个通道有三个不同的响应，三个不同的fitting曲线。</p>
 
-<ol>
-<li>Variance Stabilization</li>
-</ol>
+<p>3&gt;  Variance Stabilization</p>
 
 <p>在噪声建模的论文中都用这个词Stabilization&ndash;稳定化。实际上我的理解就是把噪声对亮度做‘归一化’。因为在现在的信号处理方法中，信号依赖性的噪声处理起来非常不便。所以需要把噪声对亮度做归一化。这样就需要根据前边的fitting curve产生conversion function curve。</p>
 
 <p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/conversion_function_curve.wm.jpg" alt="Conversion Function Curve" /></p>
 
-<ol>
-<li>把conversion function curve 作用到原始信号就会得到噪声归一化的信号：</li>
-</ol>
+<p>4&gt;  把conversion function curve 作用到原始信号就会得到噪声归一化的信号：</p>
 
 <p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/variance_stabilization.wm.jpg" alt="Variance Stabilization" /></p>
 
-<ol>
-<li>用常用的去噪方法，比如wiener filter and dct, bm3d, wavelet-based 方法, nlmeans 进行去噪</li>
-<li>做完去噪，再做反变换，就可以恢复成原始的信号</li>
-</ol>
+<p>5&gt;  用常用的去噪方法，比如wiener filter and dct, bm3d, wavelet-based 方法, nlmeans 进行去噪</p>
+
+<p>6&gt;  做完去噪，再做反变换，就可以恢复成原始的信号</p>
 
 <p><strong>参考文献：</strong></p>
 
