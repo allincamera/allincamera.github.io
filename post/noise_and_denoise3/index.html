@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>图解噪声与去噪之三：噪声建模与去噪 &middot; All in Camera</title>
+
+  
+  <link rel="stylesheet" href="http://allincamera.github.io/css/poole.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/poole-overrides.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde-overrides.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/hyde-x.css">
+  <link rel="stylesheet" href="http://allincamera.github.io/css/highlight/sunburst.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://allincamera.github.io/touch-icon-144-precomposed.png">
+  <link href="http://allincamera.github.io/favicon.png" rel="icon">
+
+  
+  
+  
+  
+
+  <meta name="description" content="Everything about Camera">
+  <meta name="keywords" content="Camera, Imaging, Tech, technique, ISP, algorithm">
+  
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-76087778-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  
+</head>
+<body class="theme-base-0b">
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      
+        <img src="https://www.gravatar.com/avatar/7100bb8dad0bb0641c343caf30e9613d?s=200"
+             alt="gravatar" title="All in Camera">
+      
+      <h1>All in Camera</h1>
+      <p class="lead">Here we discuss all about camera.</p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item"><a href="http://allincamera.github.io/">Blog</a></li>
+      
+    </ul>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-nav-item">
+      <a href="https://github.com/allincamera"><i class="fa fa-github-square fa-3x"></i></a>
+      
+      
+      <a href="https://www.linkedin.com/in/xiadan"><i class="fa fa-linkedin-square fa-3x"></i></a>
+      <a href="https://plus.google.com/u/0/112601184917141694227"><i class="fa fa-google-plus-square fa-3x"></i></a>
+      
+      <a href="https://twitter.com/ptthisdan"><i class="fa fa-twitter-square fa-3x"></i></a>
+      
+      <a href="http://allincamera.github.io/index.xml" type="application/rss+xml"><i class="fa fa-rss-square fa-3x"></i></a>
+      </li>
+    </ul>
+
+    
+
+    <p>Copyright &copy; 2016 <a href="http://allincamera.github.io/license/">License</a><br/>
+       Powered by <a href="http://gohugo.io">Hugo</a> and <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
+  </div>
+</div>
+
+
+<div class="content container">
+  <div class="post">
+    <h1 class="post-title">图解噪声与去噪之三：噪声建模与去噪</h1>
+    <span class="post-date">May 21, 2016 &middot; 1 minute read &middot; <a href="http://allincamera.github.io/post/noise_and_denoise3/#disqus_thread">Comments</a>
+    
+    <br/>
+    <a class="label" href="http://allincamera.github.io/categories/hardware">hardware</a><a class="label" href="http://allincamera.github.io/categories/software">software</a><a class="label" href="http://allincamera.github.io/categories/system">system</a>
+    </span>
+    <p><strong>本文系微信公众号『大话成像』，知乎专栏『All in Camera』原创文章，转载请注明出处。</strong></p>
+
+<p>上一篇说到bm3d等高级算法可以利用数学方式把信号分解成不同性质的部分，然后根据不同的噪声特点进行去噪。噪声模型则是去噪算法的重要依据。</p>
+
+<p>先看一个实验，拍摄一张Grey Scale Chart:</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/grey_scale_chart.jpg" alt="Grey Scale Chart" /></p>
+
+<p>曝光时间 33ms， ISO 3200，得到如下图像：</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/gs_33ms_iso3200_01.jpg" alt="exp_33ms_iso_3200" /></p>
+
+<p>图像上有很多噪声，对这个图像做横切，可以得到pixelvalue相对intensity的关系图</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/gs_33ms_iso3200_01_transverse.jpg" alt="exp_33ms_iso_3200_transverse" /></p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/pixel_value_linear_distance.wm.jpg" alt="Pixel Value vs Intensity" /></p>
+
+<p>继续拍摄至N张照片，将N张照片求平均得到一张照片</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/avg_photos.wm.png" alt="Average N Photos" /></p>
+
+<p>求和平均得到的照片</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/avg_photos_result.label.jpg" alt="Averaged Photo" /></p>
+
+<p>把所有图片的像素值与亮度标在一个图中</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/pixel_value_intensity_all.wm.jpg" alt="All Pixel Value vs. Intensity" /></p>
+
+<p>中间的实线是图像均值，所有被虚线包围的红色的点，是所有图像的像素值。</p>
+
+<p>按照图解噪声与去噪第一篇里的方法，画出像素标准差对均值的曲线可以得到</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/sigma_vs_mu.wm.jpg" alt="Sigma vs. Mu" /></p>
+
+<p>从上图可以看出：
+    1. 噪声随着亮度的增加而增加。
+    2. 标准差与均值遵循一定的函数关系。</p>
+
+<p>把多组实验的结果叠加可以得到下图：</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/multi_sigma_vs_mu.wm.jpg" alt="Multi Sigma vs. Mu" /></p>
+
+<p>可以看出在平滑的曲线上多了许多毛刺.</p>
+
+<p>从上面两张图可以看出在图像中存在着两种噪声：信号相关噪声，信号不相关噪声。平滑上升的曲线是随信号均值上升的，而毛刺是不随信号均值增大的。</p>
+
+<p>数学上把这两种噪声用泊松分布模型和高斯分布模型来描述：</p>
+
+<blockquote>
+<p>y = α Pi + ni, pi ~ P(x), Ni ~ N(0,σ2)，</p>
+</blockquote>
+
+<p>y是总噪声，α是量化参数，Pi是泊松噪声，Ni是高斯噪声，x是信号。Pi是信号相关的，Ni是信号不相关的。</p>
+
+<p>以上证明了噪声模型的数学实现性，真正应用的噪声模型比上述基本模型要复杂一些。有了噪声的数学模型，就可以用统计学的方法，针对这两种不同的噪声模型进行处理。
+具体的过程如下：</p>
+
+<ol>
+<li>先得到一个sensor的噪声profile(标准差 对 亮度）</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/sensor_noise_profile.wm.png" alt="Sensor Noise Profile" /></p>
+
+<ol>
+<li>利用之前说的泊松-高斯模型做curve fitting</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/curve_fitting.wm.png" alt="Curve fitting" /></p>
+
+<p>RGB三个通道有三个不同的响应，三个不同的fitting曲线。</p>
+
+<ol>
+<li>Variance Stabilization</li>
+</ol>
+
+<p>在噪声建模的论文中都用这个词Stabilization&ndash;稳定化。实际上我的理解就是把噪声对亮度做‘归一化’。因为在现在的信号处理方法中，信号依赖性的噪声处理起来非常不便。所以需要把噪声对亮度做归一化。这样就需要根据前边的fitting curve产生conversion function curve。</p>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/conversion_function_curve.wm.jpg" alt="Conversion Function Curve" /></p>
+
+<ol>
+<li>把conversion function curve 作用到原始信号就会得到噪声归一化的信号：</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/variance_stabilization.wm.jpg" alt="Variance Stabilization" /></p>
+
+<ol>
+<li>用常用的去噪方法，比如wiener filter and dct, bm3d, wavelet-based 方法, nlmeans 进行去噪</li>
+<li>做完去噪，再做反变换，就可以恢复成原始的信号</li>
+</ol>
+
+<p><strong>参考文献：</strong></p>
+
+<blockquote>
+<p>markku makitalo, alessandro foi: optimal inversion of the generalized anscombe transformation for poisson-gaussian noise, ieee trans. image process</p>
+
+<p>alessandro foi et al.: practical poissonian-gaussian noise modeling and fitting for single-image raw-data, ieee trans. image process. vol. 17, no. 10, 2008.</p>
+
+<p>k. dabov, a. foi, v. katkovnik, and k. egiazarian: image denoising with block-matching and 3d filtering. proc. spie electronic imaging, 2006.</p>
+</blockquote>
+
+<p>Alessandro Foi是芬兰Tampere大学研究图像去噪和噪声建模的教授，他的文章谈到的方法很多都已经在手机camera中得到了应用，具有很高的参考价值。</p>
+
+<p><strong>本文系微信公众号『大话成像』，知乎专栏『All in Camera』原创文章，转载请注明出处。</strong></p>
+
+  </div>
+  <div id="disqus_thread"></div>
+</div>
+
+
+<script type="text/javascript">
+var disqus_shortname = "httpallincameragithubio";
+(function () {
+    var s = document.createElement('script'); s.async = true;
+    s.type = 'text/javascript';
+    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script>
+
+
+
+<script type="text/javascript">
+    var disqus_shortname = "httpallincameragithubio";
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+<script src="http://allincamera.github.io/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript"
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    
+    
+    
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i = 0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+</body>
+</html>
+

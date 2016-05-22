@@ -6,8 +6,122 @@
     <description>Recent content in Sensor on All in Camera</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 30 Apr 2016 00:44:57 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 21 May 2016 17:41:29 +0800</lastBuildDate>
     <atom:link href="http://allincamera.github.io/tags/sensor/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>图解噪声与去噪之三：噪声建模与去噪</title>
+      <link>http://allincamera.github.io/post/noise_and_denoise3/</link>
+      <pubDate>Sat, 21 May 2016 17:41:29 +0800</pubDate>
+      
+      <guid>http://allincamera.github.io/post/noise_and_denoise3/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;本文系微信公众号『大话成像』，知乎专栏『All in Camera』原创文章，转载请注明出处。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;上一篇说到bm3d等高级算法可以利用数学方式把信号分解成不同性质的部分，然后根据不同的噪声特点进行去噪。噪声模型则是去噪算法的重要依据。&lt;/p&gt;
+
+&lt;p&gt;先看一个实验，拍摄一张Grey Scale Chart:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/grey_scale_chart.jpg&#34; alt=&#34;Grey Scale Chart&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;曝光时间 33ms， ISO 3200，得到如下图像：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/gs_33ms_iso3200_01.jpg&#34; alt=&#34;exp_33ms_iso_3200&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;图像上有很多噪声，对这个图像做横切，可以得到pixelvalue相对intensity的关系图&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/gs_33ms_iso3200_01_transverse.jpg&#34; alt=&#34;exp_33ms_iso_3200_transverse&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/pixel_value_linear_distance.wm.jpg&#34; alt=&#34;Pixel Value vs Intensity&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;继续拍摄至N张照片，将N张照片求平均得到一张照片&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/avg_photos.wm.png&#34; alt=&#34;Average N Photos&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;求和平均得到的照片&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/avg_photos_result.label.jpg&#34; alt=&#34;Averaged Photo&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;把所有图片的像素值与亮度标在一个图中&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/pixel_value_intensity_all.wm.jpg&#34; alt=&#34;All Pixel Value vs. Intensity&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;中间的实线是图像均值，所有被虚线包围的红色的点，是所有图像的像素值。&lt;/p&gt;
+
+&lt;p&gt;按照图解噪声与去噪第一篇里的方法，画出像素标准差对均值的曲线可以得到&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/sigma_vs_mu.wm.jpg&#34; alt=&#34;Sigma vs. Mu&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;从上图可以看出：
+    1. 噪声随着亮度的增加而增加。
+    2. 标准差与均值遵循一定的函数关系。&lt;/p&gt;
+
+&lt;p&gt;把多组实验的结果叠加可以得到下图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/multi_sigma_vs_mu.wm.jpg&#34; alt=&#34;Multi Sigma vs. Mu&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看出在平滑的曲线上多了许多毛刺.&lt;/p&gt;
+
+&lt;p&gt;从上面两张图可以看出在图像中存在着两种噪声：信号相关噪声，信号不相关噪声。平滑上升的曲线是随信号均值上升的，而毛刺是不随信号均值增大的。&lt;/p&gt;
+
+&lt;p&gt;数学上把这两种噪声用泊松分布模型和高斯分布模型来描述：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;y = α Pi + ni, pi ~ P(x), Ni ~ N(0,σ2)，&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;y是总噪声，α是量化参数，Pi是泊松噪声，Ni是高斯噪声，x是信号。Pi是信号相关的，Ni是信号不相关的。&lt;/p&gt;
+
+&lt;p&gt;以上证明了噪声模型的数学实现性，真正应用的噪声模型比上述基本模型要复杂一些。有了噪声的数学模型，就可以用统计学的方法，针对这两种不同的噪声模型进行处理。
+具体的过程如下：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;先得到一个sensor的噪声profile(标准差 对 亮度）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/sensor_noise_profile.wm.png&#34; alt=&#34;Sensor Noise Profile&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;利用之前说的泊松-高斯模型做curve fitting&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/curve_fitting.wm.png&#34; alt=&#34;Curve fitting&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;RGB三个通道有三个不同的响应，三个不同的fitting曲线。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Variance Stabilization&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;在噪声建模的论文中都用这个词Stabilization&amp;ndash;稳定化。实际上我的理解就是把噪声对亮度做‘归一化’。因为在现在的信号处理方法中，信号依赖性的噪声处理起来非常不便。所以需要把噪声对亮度做归一化。这样就需要根据前边的fitting curve产生conversion function curve。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/conversion_function_curve.wm.jpg&#34; alt=&#34;Conversion Function Curve&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;把conversion function curve 作用到原始信号就会得到噪声归一化的信号：&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://raw.githubusercontent.com/allincamera/imgur/master/noise_and_denoise3/variance_stabilization.wm.jpg&#34; alt=&#34;Variance Stabilization&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;用常用的去噪方法，比如wiener filter and dct, bm3d, wavelet-based 方法, nlmeans 进行去噪&lt;/li&gt;
+&lt;li&gt;做完去噪，再做反变换，就可以恢复成原始的信号&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;参考文献：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;markku makitalo, alessandro foi: optimal inversion of the generalized anscombe transformation for poisson-gaussian noise, ieee trans. image process&lt;/p&gt;
+
+&lt;p&gt;alessandro foi et al.: practical poissonian-gaussian noise modeling and fitting for single-image raw-data, ieee trans. image process. vol. 17, no. 10, 2008.&lt;/p&gt;
+
+&lt;p&gt;k. dabov, a. foi, v. katkovnik, and k. egiazarian: image denoising with block-matching and 3d filtering. proc. spie electronic imaging, 2006.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Alessandro Foi是芬兰Tampere大学研究图像去噪和噪声建模的教授，他的文章谈到的方法很多都已经在手机camera中得到了应用，具有很高的参考价值。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;本文系微信公众号『大话成像』，知乎专栏『All in Camera』原创文章，转载请注明出处。&lt;/strong&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>【科普】双摄像头能做什么？</title>
@@ -19,9 +133,13 @@
 
 &lt;p&gt;&lt;strong&gt;本文系微信公众号『大话成像』，知乎专栏『all in camera』原创文章，转载请注明出处并保留本声明&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;目前主流的双摄像头的功能。主要可以分为两大类：
-1. 利用双摄像头产生立体视觉，获得影像的景深。以及利用将不同的景深进行3D建模，图像处理，物体分割，物体识别和跟踪，对焦辅助之类的功能
-2. 利用左右两张不同的图片信息进行融合，以期望得到更高的分辨率，更好的色彩，动态范围等更好的图像质量。&lt;/p&gt;
+&lt;p&gt;目前主流的双摄像头的功能。主要可以分为两大类：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;利用双摄像头产生立体视觉，获得影像的景深。以及利用将不同的景深进行3D建模，图像处理，物体分割，物体识别和跟踪，对焦辅助之类的功能&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;利用左右两张不同的图片信息进行融合，以期望得到更高的分辨率，更好的色彩，动态范围等更好的图像质量。&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;p&gt;这两类双摄像头功能对于摄像头的硬件有着不同的要求，前者要求两个摄像头得到像差尽量大，这样能够得到的景深精度更高，因此前者的硬件希望两个摄像头间的距离比较远才好。而后者希望两个摄像头的像在空间和时间上都尽量能够接近，因此在硬件设计的时候希望两个摄像头离得比较近。这样在两个图像融合的时候才不会因为相差产生更多的错误。&lt;/p&gt;
 
